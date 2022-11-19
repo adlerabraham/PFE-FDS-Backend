@@ -11,43 +11,11 @@ from rest_framework.exceptions import AuthenticationFailed
 
 
 
-
 class User_serializer(ModelSerializer):
 
     class Meta:
         model = User      
         fields = '__all__'
-
-
-
-
-class Super_admin_serializer(ModelSerializer):
-
-    class Meta :
-        model = Super_admin
-        fields='__all__'
-
-
-class Admin_serializer(ModelSerializer):
-
-    class Meta :
-        model = Admin
-        fields='__all__'
-
-
-class Teacher_serializer(ModelSerializer):
-
-    class Meta :
-        model = Teacher
-        fields='__all__'
-
-
-class Student_serializer(ModelSerializer):
-
-    class Meta :
-        model = Student
-        fields='__all__'
-
 
 
 
@@ -63,7 +31,7 @@ class Register_user_serializer(ModelSerializer):
          }
     ) 
 
-    password2 = CharField(
+    initial_password = CharField(
         write_only=True, 
         min_length=MIN_LENGTH, 
         error_messages ={
@@ -94,7 +62,7 @@ class Register_user_serializer(ModelSerializer):
 
 
     def validate(self, data):
-        if data["password"] != data["password2"]:
+        if data["password"] != data["initial_password"]:
             raise ValidationError("Passwords don't match")
         return data
 
@@ -104,12 +72,14 @@ class Register_user_serializer(ModelSerializer):
             first_name = validated_data["first_name"],
             last_name = validated_data["last_name"],
             email = validated_data["email"],
+            #numero_telephone = validated_data["numero_telephone"],
             # groupe_sanguin =  validated_data["groupe_sanguin"],
             # date_naissance =  validated_data["date_naissance"], 
             # adresse =  validated_data["adresse"],  
             # sexe =  validated_data["sexe"],  
             is_superuser =  validated_data["is_superuser"], 
             is_staff = validated_data ["is_staff"],
+            initial_password = validated_data ["initial_password"],
 
             )
 
@@ -204,7 +174,7 @@ class Change_password_serializer(ModelSerializer):
         return value
 
     def update(self, instance, validated_data):
-
+        instance.initial_password = " " 
         instance.set_password(validated_data['password'])
         instance.save()
 
@@ -215,10 +185,12 @@ class Change_password_serializer(ModelSerializer):
 
 
 class Reset_password_send_email_serializer(Serializer):
+
+    username = CharField(max_length = 100)
     email=EmailField(min_length = 2)
 
     class Meta:
-        fields = ['email']
+        fields = ['email' , 'username']
 
 
 
@@ -226,40 +198,46 @@ class Set_new_password_serializer(Serializer):
 
     #password = CharField(write_only=True, required=True, validators=[validate_password])
     password = CharField(min_length = 3, max_length = 68, write_only = True)
-    #password2 = CharField(min_length = 3, max_length = 68, write_only = True)
+    password2 = CharField(min_length = 3, max_length = 68, write_only = True)
     token = CharField(min_length = 1, max_length = 68, write_only = True)
     uidb64 = CharField(min_length = 1, max_length = 68, write_only = True)
 
     class Meta:
         fields = ['password', 'password2', 'token', 'uidb64']
 
-
-
-    # def validate(self, data):
-        
-    #     if data["password"] != data["password2"]:
-    #         raise ValidationError("Passwords don't match")
-    #     return data
-        
-
         
     def validate(self,attrs):
         try: 
+            
             password = attrs.get('password')
+            password2 = attrs.get('password2')
             token = attrs.get('token')
             uidb64 = attrs.get('uidb64')
 
             id = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id=id)
-            if not PasswordResetTokenGenerator().check_token(user, token):
-                raise AuthenticationFailed ('The reset link is invalid', 401)
 
+            if password != password2:
+                raise ValidationError({"password": "Password fields didn't match."})
+
+
+            elif not PasswordResetTokenGenerator().check_token(user, token):
+                raise AuthenticationFailed ('The reset link is invalid', 401)
+  
+  
             user.set_password(password)
             user.save()
-
             return (user)
 
-        except Exception as e :
+
+        except ValidationError as identifier :
+            raise ValidationError({"password": "Password fields didn't match."})
+
+        except AuthenticationFailed as identifier :
             raise AuthenticationFailed ('The reset link is invalid', 401)
+        
+        except Exception as e :
+            raise AuthenticationFailed ("Token Invalid", 401)
+   
         
         return super().validate(attrs)

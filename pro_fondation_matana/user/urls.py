@@ -8,10 +8,6 @@ from rest_framework_simplejwt.views import TokenRefreshView
 router =  DefaultRouter()
 
 router.register('userprofile', User_viewset, basename='userprofile'),
-router.register('superadminprofile', Super_admin_viewset, basename='superadminprofile'),
-router.register('adminprofile', Admin_viewset, basename='adminprofile'),
-router.register('tacherprofile', Teacher_viewset, basename='teacherprofile'),
-router.register('studentprofile', Student_viewset, basename='studentprofile'),
 
 urlpatterns= [
 

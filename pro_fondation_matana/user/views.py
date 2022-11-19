@@ -59,34 +59,6 @@ class User_viewset(ModelViewSet):
 
 
 
-class Super_admin_viewset(ModelViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = Super_admin_serializer
-
-
-
-class Admin_viewset(ModelViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = Admin_serializer
-
-
-
-class Teacher_viewset(ModelViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = Teacher_serializer
-
-
-
-class Student_viewset(ModelViewSet):
-
-    queryset = User.objects.all()
-    serializer_class = Student_serializer
-
-
-
 
 
 class Register_user_view(GenericAPIView):
@@ -106,7 +78,7 @@ class Register_user_view(GenericAPIView):
         current_site = get_current_site(request).domain
         relativeLink = reverse('verifyemail')
         absurl = 'http://'+ current_site + relativeLink + "?token=" + str(token)
-        email_body = 'Hi ' + user.username + ',' + '\n I am Levilson Palanquet, your registration assistant. Please, use the link below to verify your email account ! \n \n \n ' + absurl
+        email_body = 'Hi ' + user.username + ',' + '\n I am Levilson Palanquet, your registration assistant. \n You can login using those informations : \n username : ' + user.username + '\n password :' + user.initial_password + '\n Make sure you change your password once you login \n' 'Please, use the link below to verify your email account ! \n  ' + absurl
         data = {'email_body': email_body, 'to_email':user.email ,'email_subject' : 'VERIFY YOUR EMAIL'}
 
         Util.send_email(data)
@@ -136,7 +108,7 @@ class VerifyEmail (GenericAPIView):
 class Update_user_view(UpdateAPIView):
 
     queryset = User.objects.all()
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
     serializer_class = Update_user_serializer
 
 
@@ -162,6 +134,7 @@ class Reset_password_send_email_view(GenericAPIView):
         serializer.is_valid(raise_exception= True)
 
         email = request.data['email']
+        username = request.data['username']
         
         if User.objects.filter(email=email).exists():
                 user= User.objects.get(email=email)
@@ -170,7 +143,7 @@ class Reset_password_send_email_view(GenericAPIView):
                 current_site = get_current_site(request= request).domain
                 relativeLink = reverse('resetpasswordconfirm', kwargs={'uidb64':uidb64, 'token': token})
                 absurl = 'http://'+ current_site + relativeLink 
-                email_body = 'Hello, \n I am Levilson Palanquet, your registration assistant. Please, use the link below to reset your password \n \n \n ' + absurl
+                email_body = 'Hello ' + username + ',' '\n I am Levilson Palanquet, your registration assistant. Please, use the link below to reset your password \n \n \n ' + absurl
                 data = {'email_body': email_body, 'to_email':user.email ,'email_subject' : 'RESET YOUR PASSWORD'}
 
                 Util.send_email(data)
@@ -194,8 +167,7 @@ class PasswordTokenCheckAPI(GenericAPIView):
 
             return Response({'success': True, 'message': 'Credentials valid', 'uidb64': uidb64, 'token':token}, status = status.HTTP_200_OK)
            
-        except DjangoUnicodeDecodeError as identifier :
-            #if not PasswordResetTokenGenerator().check_token(user, token):
+        except DjangoUnicodeDecodeError as identifier :           
                 return Response({'error':'Token is not valid, please request a new one'},status = status.HTTP_401_UNAUTHORIZED)
 
 

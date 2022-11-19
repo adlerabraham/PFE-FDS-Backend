@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     #MY APPS
     'user',
+    'userprofile',
     'school',
     'formation',
     
@@ -178,7 +179,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
     'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id', #hojvgvrgssaqbqmm
+    'USER_ID_CLAIM': 'user_id', 
     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
 
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
@@ -198,5 +199,5 @@ SIMPLE_JWT = {
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = '' #os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = '' #os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = 'jeuds@gmail.com' #os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = 'hojvgvrgssaqbqm' #os.environ.get('EMAIL_HOST_PASSWORD')

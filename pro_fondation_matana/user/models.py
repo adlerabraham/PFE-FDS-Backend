@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import gettext_lazy 
+from school.models import Ecole
 
 
 
@@ -32,11 +33,12 @@ class User(AbstractUser):
 
     date_naissance = models.DateField(max_length=25, blank=False, null=True)
     adresse = models.CharField(max_length=250, blank=False, null=True)
-    phone_number = PhoneNumberField(max_length=25, blank=False, null=True),
+    numero_telephone = PhoneNumberField(max_length=25, blank=False, null=True),
     sexe = models.CharField(max_length=25, choices=Sexe.choices, blank=False, null=True)
     groupe_sanguin = models.CharField(max_length=25, choices=Groupe_Sanguin.choices, blank=False, null=True)
     photo_profil=models.ImageField(upload_to='user', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    initial_password = models.CharField(max_length=250, blank=False, null=True, verbose_name= 'password2')
 
 
 
@@ -44,34 +46,3 @@ class User(AbstractUser):
         db_table = 'utilisateur'
 
 
-
-class Super_admin(models.Model):
-    User = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    class Meta :
-        db_table = 'super_admin'
-
-class Admin(models.Model):
-    User = models.OneToOneField(User, on_delete=models.CASCADE)
-    #institution= models.ForeignKey(Institution, on_delete=models.CASCADE)
-    
-    class Meta :
-        db_table = 'admin'
-
-
-class Student(models.Model):
-    responsible_person = models.CharField(max_length=250, blank=False, null=True)
-    relationship = models.CharField(max_length=250, blank=False, null=True)
-    phone_number =PhoneNumberField(help_text='Ex:+509XXXXXXXX',blank=True,max_length=15, null=True)
-    User = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    class Meta :
-        db_table = 'etudiant'
-
-
-class Teacher(models.Model):
-    User = models.OneToOneField(User, on_delete=models.CASCADE)
-
-
-    class Meta :
-        db_table = 'professeur'
