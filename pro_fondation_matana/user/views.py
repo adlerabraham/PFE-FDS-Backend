@@ -23,6 +23,8 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .utils import Util
+from userprofile.permissions import *
+
 
 
 # Create your views here.
@@ -58,16 +60,23 @@ class User_viewset(ModelViewSet):
     serializer_class = User_serializer
 
 
+class Register_user_view(APIView):
 
-
-
-class Register_user_view(GenericAPIView):
+    http_method_names = ['post', 'get', 'put']
 
     serializer_class = Register_user_serializer
 
+
+
+    def get(self, request):
+        users = User.undeleted_objects.all()
+        serializer = self.serializer_class(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def post(self, request):
         user = request.data
-        serializer = self.serializer_class(data=user)
+        serializer = self.serializer_class(data=user,context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user_data = serializer.data
@@ -78,12 +87,40 @@ class Register_user_view(GenericAPIView):
         current_site = get_current_site(request).domain
         relativeLink = reverse('verifyemail')
         absurl = 'http://'+ current_site + relativeLink + "?token=" + str(token)
-        email_body = 'Hi ' + user.username + ',' + '\n I am Levilson Palanquet, your registration assistant. \n You can login using those informations : \n username : ' + user.username + '\n password :' + user.initial_password + '\n Make sure you change your password once you login \n' 'Please, use the link below to verify your email account ! \n  ' + absurl
+        email_body = 'Hi ' + user.username + ',' + '\n I am Levilson Palanquet, your registration assistant. \n Here are some informations about your account : \n username : ' + user.username + '\n password :' + user.initial_password + '\n Once login, you will asked to set a new password.\n' 'Please, use the link below to verify your email account first ! \n  ' + absurl
         data = {'email_body': email_body, 'to_email':user.email ,'email_subject' : 'VERIFY YOUR EMAIL'}
 
         Util.send_email(data)
 
         return Response (user_data, status=status.HTTP_201_CREATED)
+ 
+
+
+
+
+# class Register_user_view(GenericAPIView):
+
+#     serializer_class = Register_user_serializer
+
+#     def post(self, request):
+#         user = request.data
+#         serializer = self.serializer_class(data=user)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         user_data = serializer.data
+#         user = User.objects.get(email=user_data['email'])
+        
+#         token = RefreshToken.for_user(user).access_token
+
+#         current_site = get_current_site(request).domain
+#         relativeLink = reverse('verifyemail')
+#         absurl = 'http://'+ current_site + relativeLink + "?token=" + str(token)
+#         email_body = 'Hi ' + user.username + ',' + '\n I am Levilson Palanquet, your registration assistant. \n You can login using those informations : \n username : ' + user.username + '\n password :' + user.initial_password + '\n Make sure you change your password once you login \n' 'Please, use the link below to verify your email account ! \n  ' + absurl
+#         data = {'email_body': email_body, 'to_email':user.email ,'email_subject' : 'VERIFY YOUR EMAIL'}
+
+#         Util.send_email(data)
+
+#         return Response (user_data, status=status.HTTP_201_CREATED)
  
     
 class VerifyEmail (GenericAPIView):
@@ -104,23 +141,63 @@ class VerifyEmail (GenericAPIView):
 
 
 
-
-class Update_user_view(UpdateAPIView):
-
-    queryset = User.objects.all()
-    #permission_classes = (IsAuthenticated,)
+class Update_user_view(APIView):
+    permission_classes = (IsAuthenticated,)
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete']
     serializer_class = Update_user_serializer
 
+    def get(self, request, pk):
+        user = User.undeleted_objects.get(pk=pk)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+    def put(self, request, pk):
+        user = User.undeleted_objects.get(pk=pk)
+        if request.user != user and "admin" not in request.user.groups.values_list("name", flat=True):
+            return Response({"authorize": "You don't have permission to update this user."}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.serializer_class(user, data=request.data, partial=True, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def delete(self, request, *args, **kwargs):
+        self.permission_classes = (IsAdminUser,)
+        self.check_permissions(request)
+        user = User.undeleted_objects.get(pk=kwargs['pk'])
+        delete_user_instance(request, user)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# class Update_user_view(UpdateAPIView):
+
+#     queryset = User.objects.all()
+#     #permission_classes = (IsAuthenticated,)
+#     serializer_class = Update_user_serializer
 
 
 
 class Change_password_view(UpdateAPIView):
 
-    queryset = User.objects.all()
-    #permission_classes = (IsAuthenticated,)
+    queryset = User.undeleted_objects.all()
+    permission_classes = (IsAuthenticated,)
     serializer_class = Change_password_serializer
+
+    def patch(self, request):
+        
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception= True)          
+        return Response({'success': True, 'message': 'Password changed successfully'}, status = status.HTTP_200_OK)
+
+              
+
+
+# class Change_password_view(UpdateAPIView):
+
+#     queryset = User.objects.all()
+#     #permission_classes = (IsAuthenticated,)
+#     serializer_class = Change_password_serializer
 
 
 class Reset_password_send_email_view(GenericAPIView):

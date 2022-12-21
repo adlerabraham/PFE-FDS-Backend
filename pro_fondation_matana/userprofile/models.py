@@ -1,8 +1,10 @@
 from django.db import models
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-from school.models import Ecole
+from school.models import *
 from user.models import User
+from pro_fondation_matana.mixins import *
+
 
 # Create your models here.
 
@@ -12,27 +14,27 @@ class Super_admin(models.Model):
     class Meta :
         db_table = 'super_admin'
 
-class Admin(models.Model):
+class Admin(AuditMixin, models.Model):
     User = models.OneToOneField(User, on_delete=models.CASCADE)
-    ecole= models.ForeignKey(Ecole, on_delete=models.CASCADE)
+    institution= models.ForeignKey(Institution, on_delete=models.CASCADE)
     
     class Meta :
         db_table = 'admin'
 
 
-class Student(models.Model):
-    personne_responsable = models.CharField(max_length=250, blank=False, null=True)
-    lien = models.CharField(max_length=250, blank=False, null=True)
-    numero_telephone =PhoneNumberField(help_text='Ex:+509XXXXXXXX',blank=True,max_length=15, null=True)
+class Student(AuditMixin, models.Model):
+    responsible_person = models.CharField(max_length=250, blank=False, null=True)
+    relationship = models.CharField(max_length=250, blank=False, null=True)
+    phone_number =PhoneNumberField(help_text='Ex:+509XXXXXXXX',blank=True,max_length=15, null=True)
     User = models.OneToOneField(User, on_delete=models.CASCADE)
 
     class Meta :
-        db_table = 'etudiant'
+        db_table = 'student'
 
 
-class Teacher(models.Model):
+class Teacher(AuditMixin, models.Model):
     User = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
     class Meta :
-        db_table = 'professeur'
+        db_table = 'teacher'

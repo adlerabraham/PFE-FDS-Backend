@@ -1,63 +1,63 @@
 from rest_framework import serializers
 from formation.models import *
 
-class Programme_serializer(serializers.ModelSerializer):
+class Program_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Programme
+        model= Program
         fields = '__all__'
 
 
-class Periode_serializer(serializers.ModelSerializer):
+class Period_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Periode
+        model= Period
         fields = '__all__'
 
 
-class Programme_periode_serializer(serializers.ModelSerializer):
+class Program_period_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Programme_periode
+        model= Program_period
         fields = '__all__'
 
 
-class Niveau_serializer(serializers.ModelSerializer):
+class Level_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Niveau
+        model= Level
         fields = '__all__'
 
 
-class Programme_periode_niveau_serializer(serializers.ModelSerializer):
+class Program_period_level_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Programme_periode_niveau
+        model= Program_period_level
         fields = '__all__'
 
 
-class Classe_serializer(serializers.ModelSerializer):
+class Classroom_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Classe
-        fields = '__all__'
-
-
-
-class Matiere_serializer(serializers.ModelSerializer):
-    class Meta:
-        model= Matiere
-        fields = '__all__'
-
-
-class Matiere_programme_periode_serializer(serializers.ModelSerializer):
-    class Meta:
-        model= Matiere_programme_periode
+        model= Classroom
         fields = '__all__'
 
 
 
-class Cours_serializer(serializers.ModelSerializer):
+class Subject_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Cours
+        model= Subject
         fields = '__all__'
 
 
-class Lecon_serializer(serializers.ModelSerializer):
+class Subject_program_period_serializer(serializers.ModelSerializer):
     class Meta:
-        model= Lecon
+        model= Subject_program_period
+        fields = '__all__'
+
+
+
+class Course_serializer(serializers.ModelSerializer):
+    class Meta:
+        model= Course
+        fields = '__all__'
+
+
+class Lesson_serializer(serializers.ModelSerializer):
+    class Meta:
+        model= Lesson
         fields = '__all__'

@@ -1,183 +1,185 @@
 from django.db import models
 from django.template.defaultfilters import slugify
-from school.models import Ecole
+from school.models import *
+from pro_fondation_matana.mixins import *
+
 
 # Create your models here.
 
 
-class Programme(models.Model):
-    nom = models.CharField(max_length=100)
+class Program(AuditMixin, SoftDeleteModel, models.Model):
+    name = models.CharField(max_length=100)
     slug = models.SlugField(null=True, blank=True)
-    ecole = models.ForeignKey(Ecole, on_delete=models.CASCADE, related_name='ecole')
-    logo=models.ImageField(upload_to='programme', blank=True)
+    Institution = models.ForeignKey(Institution, on_delete=models.CASCADE, related_name='institution')
+    logo=models.ImageField(upload_to='program', blank=True)
     description = models.TextField(max_length = 100)
-    nom_responsable = models.CharField(max_length=100)
+    responsible = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.nom
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug= slugify(self.nom)
+        self.slug= slugify(self.name)
         super().save(*args, **kwargs) 
 
     class Meta :
-        db_table = 'programme'
+        db_table = 'program'
 
 
 
 
-class Periode(models.Model):
-    nom = models.CharField(max_length=100)
+class Period(AuditMixin, SoftDeleteModel, models.Model):
+    name = models.CharField(max_length=100)
     slug = models.SlugField(null=True, blank=True)
-    date_debut = models.DateField(max_length=25, blank=False, null=True)
-    date_fin = models.DateField(max_length=25, blank=False, null=True)
+    start_date = models.DateField(max_length=25, blank=False, null=True)
+    end_date = models.DateField(max_length=25, blank=False, null=True)
     coefficient = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return self.nom
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug= slugify(self.nom)
+        self.slug= slugify(self.name)
         super().save(*args, **kwargs) 
 
     
     class Meta :
-        db_table = 'periode'
+        db_table = 'period'
     
 
 
 
-class Programme_periode(models.Model):
+class Program_period(AuditMixin, SoftDeleteModel, models.Model):
 
-    class Unite_duree (models.TextChoices):
-        mois = "mois"
-        annee = "annee"
+    class Unit_duration (models.TextChoices):
+        mois = "month"
+        annee = "year"
         
-    programme = models.ForeignKey(Programme, on_delete=models.CASCADE)
-    periode = models.ForeignKey(Periode, on_delete=models.CASCADE)
-    duree = models.PositiveSmallIntegerField()
-    unite_duree = models.CharField(max_length=25, choices=Unite_duree.choices, blank=False, null=True)
-    nombre_etudiant = models.IntegerField()
-    nombre_professeur = models.IntegerField()
+    program = models.ForeignKey(Program, on_delete=models.CASCADE)
+    period = models.ForeignKey(Period, on_delete=models.CASCADE)
+    duration = models.PositiveSmallIntegerField()
+    unit_duration = models.CharField(max_length=25, choices=Unit_duration.choices, blank=False, null=True)
+    number_student = models.IntegerField()
+    number_teacher = models.IntegerField()
 
 
     
     class Meta :
-        db_table = 'programme_periode'
+        db_table = 'program_period'
 
 
 
-class Niveau(models.Model):
-    models.SmallIntegerField()
-
-    
-    class Meta :
-        db_table = 'niveau'
-
-
-
-class Programme_periode_niveau(models.Model):    
-    programme_periode = models.ForeignKey(Programme_periode, on_delete=models.CASCADE)
-    niveau = models.ForeignKey(Niveau, on_delete=models.CASCADE)
+class Level(AuditMixin, SoftDeleteModel, models.Model):
+    level=models.SmallIntegerField()
 
     
     class Meta :
-        db_table = 'programme_periode_niveau'
+        db_table = 'level'
 
 
 
-class Classe(models.Model):
-    Programme_periode_niveau = models.ForeignKey(Programme_periode_niveau, on_delete=models.CASCADE)
-    nom = models.CharField(max_length=100)
+class Program_period_level(AuditMixin, SoftDeleteModel, models.Model):    
+    program_period = models.ForeignKey(Program_period, on_delete=models.CASCADE)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE)
+
+    
+    class Meta :
+        db_table = 'program_period_level'
+
+
+
+class Classroom(AuditMixin, SoftDeleteModel, models.Model):
+    program_period_level = models.ForeignKey(Program_period_level, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     slug = models.SlugField(null=True, blank=True)
     abbreviation = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.nom
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug= slugify(self.nom)
+        self.slug= slugify(self.name)
         super().save(*args, **kwargs) 
     
 
     class Meta :
-        db_table = 'classe'
+        db_table = 'classroom'
 
 
 
 
-class Matiere(models.Model):
-    nom = models.CharField(max_length=100)
+class Subject(AuditMixin, SoftDeleteModel, models.Model):
+    name = models.CharField(max_length=100)
     slug = models.SlugField(null=True, blank=True)
     description = models.CharField(max_length=500)
 
      
     def __str__(self):
-        return self.nom
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug= slugify(self.nom)
+        self.slug= slugify(self.name)
         super().save(*args, **kwargs) 
 
 
     class Meta :
-        db_table = 'matiere'
+        db_table = 'subject'
 
 
 
 
-class Matiere_programme_periode(models.Model):
-    Programme_periode = models.ForeignKey(Programme_periode, on_delete=models.CASCADE)
-    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
+class Subject_program_period(AuditMixin, SoftDeleteModel, models.Model):
+    Programme_periode = models.ForeignKey(Program_period, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     
 
     class Meta :
-        db_table = 'matiere_programme_periode'
+        db_table = 'subject_program_period'
 
 
 
 
-class Cours(models.Model):
-    nom = models.CharField(max_length=100)
+class Course(AuditMixin, SoftDeleteModel, models.Model):
+    name = models.CharField(max_length=100)
     slug = models.SlugField(null=True, blank=True)
-    classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
-    matiere = models.ForeignKey(Matiere, on_delete=models.CASCADE)
+    classe = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     coefficient = models.PositiveSmallIntegerField()
-    logo=models.ImageField(upload_to='cours', blank=True)
-    #professeur = models.ForeignKey(Professeur, on_delete=models.CASCADE)
+    logo=models.ImageField(upload_to='course', blank=True)
+    #teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 
        
     def __str__(self):
-        return self.nom
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug= slugify(self.nom)
+        self.slug= slugify(self.name)
         super().save(*args, **kwargs) 
 
 
     class Meta :
-        db_table = 'cours'
+        db_table = 'course'
 
 
 
 
-class Lecon(models.Model):
-    cours = models.ForeignKey(Cours, on_delete=models.CASCADE)
-    classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
-    nom = models.CharField(max_length=100)
+class Lesson(AuditMixin, SoftDeleteModel, models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    classe = models.ForeignKey(Classroom, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
     slug = models.SlugField(null=True, blank=True)
-    chapitre = models.IntegerField()
+    chapter = models.IntegerField()
     description = models.CharField(max_length=100)
     
 
 
     def __str__(self):
-        return self.nom
+        return self.name
 
     def save(self, *args, **kwargs):
-        self.slug= slugify(self.nom)
+        self.slug= slugify(self.name)
         super().save(*args, **kwargs) 
 
 
     class Meta :
-        db_table = 'lecon'
+        db_table = 'lesson'

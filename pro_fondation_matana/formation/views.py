@@ -7,53 +7,53 @@ from formation.serializers import *
 
 # Create your views here.
 
-class Programme_viewset(viewsets.ModelViewSet):
-    queryset = Programme.objects.all()
-    serializer_class= Programme_serializer
+class Program_viewset(viewsets.ModelViewSet):
+    queryset = Program.undeleted_objects.all()
+    serializer_class= Program_serializer
 
 
 
-class Periode_viewset(viewsets.ModelViewSet):
-    queryset = Periode.objects.all()
-    serializer_class= Periode_serializer
+class Period_viewset(viewsets.ModelViewSet):
+    queryset = Period.undeleted_objects.all()
+    serializer_class= Period_serializer
 
 
-class Programme_periode_viewset(viewsets.ModelViewSet):
-    queryset = Programme_periode.objects.all()
-    serializer_class= Programme_periode_serializer
+class Program_period_viewset(viewsets.ModelViewSet):
+    queryset = Program_period.undeleted_objects.all()
+    serializer_class= Program_period_serializer
 
 
-class Niveau_viewset(viewsets.ModelViewSet):
-    queryset = Niveau.objects.all()
-    serializer_class= Niveau_serializer
+class Level_viewset(viewsets.ModelViewSet):
+    queryset = Level.undeleted_objects.all()
+    serializer_class= Level_serializer
 
 
-class Programme_periode_niveau_viewset(viewsets.ModelViewSet):
-    queryset = Programme_periode_niveau.objects.all()
-    serializer_class= Programme_periode_niveau_serializer
+class Program_period_level_viewset(viewsets.ModelViewSet):
+    queryset = Program_period_level.undeleted_objects.all()
+    serializer_class= Program_period_level_serializer
 
 
 class Classe_viewset(viewsets.ModelViewSet):
-    queryset = Classe.objects.all()
-    serializer_class= Classe_serializer
+    queryset = Classroom.undeleted_objects.all()
+    serializer_class= Classroom_serializer
 
 
-class Matiere_viewset(viewsets.ModelViewSet):
-    queryset = Matiere.objects.all()
-    serializer_class= Matiere_serializer
+class Subject_viewset(viewsets.ModelViewSet):
+    queryset = Subject.undeleted_objects.all()
+    serializer_class= Subject_serializer
 
 
-class Matiere_programme_periode_viewset(viewsets.ModelViewSet):
-    queryset = Matiere_programme_periode.objects.all()
-    serializer_class= Matiere_programme_periode_serializer
+class Subject_program_period_viewset(viewsets.ModelViewSet):
+    queryset = Subject_program_period.undeleted_objects.all()
+    serializer_class= Subject_program_period_serializer
 
 
 
-class Cours_viewset(viewsets.ModelViewSet):
-    queryset = Cours.objects.all()
-    serializer_class= Cours_serializer
+class Course_viewset(viewsets.ModelViewSet):
+    queryset = Course.undeleted_objects.all()
+    serializer_class= Course_serializer
 
 
-class Lecon_viewset(viewsets.ModelViewSet):
-    queryset = Lecon.objects.all()
-    serializer_class= Lecon_serializer
+class Lesson_viewset(viewsets.ModelViewSet):
+    queryset = Lesson.undeleted_objects.all()
+    serializer_class= Lesson_serializer

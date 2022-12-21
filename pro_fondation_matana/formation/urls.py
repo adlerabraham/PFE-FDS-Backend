@@ -6,16 +6,16 @@ from formation.views import *
 
 router =  DefaultRouter()
 
-router.register('programme', Programme_viewset, basename='programme'),
-router.register('periode', Periode_viewset, basename='periode'),
-router.register('programmeperiode', Programme_periode_viewset, basename='programme_periode'),
-router.register('niveau', Niveau_viewset, basename='niveau'),
-router.register('programmeperiodeniveau', Programme_periode_niveau_viewset, basename='programme_periode_niveau'),
-router.register('classe', Classe_viewset, basename='classe'),
-router.register('matiere', Matiere_viewset, basename='matieres'),
-router.register('matiereprogrammeperiode', Matiere_programme_periode_viewset, basename='matieres'),
-router.register('cours', Cours_viewset, basename='cours'),
-router.register('lecons', Lecon_viewset, basename='lecons'),
+router.register('program', Program_viewset, basename='program'),
+router.register('period', Period_viewset, basename='period'),
+router.register('programperiod', Program_period_viewset, basename='program_period'),
+router.register('level', Level_viewset, basename='level'),
+router.register('programperiodlevel', Program_period_level_viewset, basename='program_period_level'),
+router.register('classroom', Classe_viewset, basename='classroom'),
+router.register('subject', Subject_viewset, basename='subject'),
+router.register('subjectprogramperiod', Subject_program_period_viewset, basename='subject_program_period'),
+router.register('course', Course_viewset, basename='course'),
+router.register('lesson', Lesson_viewset, basename='lesson'),
 
 
 urlpatterns= [
